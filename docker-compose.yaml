@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+  redis:
+    hostname: redis
+    container_name: redis
+    image: redis/redis-stack:latest
+    restart: unless-stopped
+    environment:
+      REDIS_ARGS: "--requirepass redis"
+    expose:
+      - 6379
+      - 8001
+    ports:
+      - 6379:6379
+      - 8001:8001
+    networks:
+      myInternal:
+        ipv4_address: 172.28.5.2
+        aliases:
+          - redis
+
+  postgres:
+    hostname: postgres
+    container_name: postgres
+    image: postgres:latest
+    restart: unless-stopped
+    shm_size: 128mb
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+    networks:
+      myInternal:
+        ipv4_address: 172.28.5.3
+        aliases:
+          - postgres
+
+networks:
+  myInternal:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.5.0/24
+          gateway: 172.28.5.254
